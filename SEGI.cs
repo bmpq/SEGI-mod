@@ -15,6 +15,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 [AddComponentMenu("Image Effects/Sonic Ether/SEGI")]
 public class SEGI : MonoBehaviour
 {
+	public SEGIAssets assetResources;
 
 #region Parameters
 	[Serializable]
@@ -511,18 +512,24 @@ public class SEGI : MonoBehaviour
 
 	void Init()
 	{
+		if (assetResources == null)
+		{
+			Debug.LogError("SEGI: 'assetResources' is not assigned!");
+			enabled = false;
+			return;
+		}
+
 		//Setup shaders and materials
-		sunDepthShader = Shader.Find("Hidden/SEGIRenderSunDepth");
+		sunDepthShader = assetResources.sunDepthShader;
+		clearCompute = assetResources.clearCompute;
+		transferIntsCompute = assetResources.transferIntsCompute;
+		mipFilterCompute = assetResources.mipFilterCompute;
 
-		clearCompute = Resources.Load("SEGIClear") as ComputeShader;
-		transferIntsCompute = Resources.Load("SEGITransferInts") as ComputeShader;
-		mipFilterCompute = Resources.Load("SEGIMipFilter") as ComputeShader;
+		voxelizationShader = assetResources.voxelizationShader;
+		voxelTracingShader = assetResources.voxelTracingShader;
 
-		voxelizationShader = Shader.Find("Hidden/SEGIVoxelizeScene");
-		voxelTracingShader = Shader.Find("Hidden/SEGITraceScene");
-		
 		if (!material) {
-			material = new Material(Shader.Find("Hidden/SEGI"));
+			material = new Material(assetResources.mainSegiShader);
 			material.hideFlags = HideFlags.HideAndDontSave;
 		}
 		
