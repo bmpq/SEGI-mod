@@ -12,7 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 #endif
 [RequireComponent(typeof(Camera))]
 [AddComponentMenu("Image Effects/Sonic Ether/SEGI (Cascaded)")]
-public class SEGICascaded : MonoBehaviour
+public class SEGICascadedRenderer : MonoBehaviour
 {
 
 

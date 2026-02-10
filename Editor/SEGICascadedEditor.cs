@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 
-[CustomEditor(typeof(SEGICascaded))]
+[CustomEditor(typeof(SEGICascadedRenderer))]
 public class SEGICascadedEditor : Editor
 {
 	SerializedObject serObj;
@@ -50,7 +50,7 @@ public class SEGICascadedEditor : Editor
 	SerializedProperty sphericalSkylight;
 	SerializedProperty innerOcclusionLayers;
 
-	SEGICascaded instance;
+    SEGICascadedRenderer instance;
 
 	const string presetPath = "Assets/SEGI/Resources/Cascaded Presets";
 
@@ -124,7 +124,7 @@ public class SEGICascadedEditor : Editor
 		innerOcclusionLayers = serObj.FindProperty("innerOcclusionLayers");
 
 
-		instance = target as SEGICascaded;
+		instance = target as SEGICascadedRenderer;
 	}
 
 	public override void OnInspectorGUI()

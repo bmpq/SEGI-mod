@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SEGIPreset : ScriptableObject
 {
-	public SEGI.VoxelResolution voxelResolution = SEGI.VoxelResolution.high;
+	public SEGIRenderer.VoxelResolution voxelResolution = SEGIRenderer.VoxelResolution.high;
 	public bool voxelAA = false;
 	[Range(0, 2)]
 	public int innerOcclusionLayers = 1;

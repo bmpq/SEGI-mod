@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class SEGIDemo : MonoBehaviour
 {
-	SEGI segi;
+	SEGIRenderer segi;
 
 	public GameObject throwObject;
 	List<GameObject> thrownObjects = new List<GameObject>();
@@ -38,12 +38,12 @@ public class SEGIDemo : MonoBehaviour
 
 	void Start()
 	{
-		segi = GetComponent<SEGI>();
+		segi = GetComponent<SEGIRenderer>();
 	}
 
 	void UpdateUIText()
 	{
-		voxelResolution.text = "Voxel Resolution: " + (segi.voxelResolution == SEGI.VoxelResolution.low ? "128" : "256");
+		voxelResolution.text = "Voxel Resolution: " + (segi.voxelResolution == SEGIRenderer.VoxelResolution.low ? "128" : "256");
         reflections.text = "Reflections: " + (segi.doReflections ? "On" : "Off");
 		cones.text = "Cones: " + segi.cones.ToString();
 		coneTraceSteps.text = "Cone Trace Steps: " + segi.coneTraceSteps.ToString();
@@ -87,14 +87,14 @@ public class SEGIDemo : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.R))
 		{
-			if (segi.voxelResolution == SEGI.VoxelResolution.high)
+			if (segi.voxelResolution == SEGIRenderer.VoxelResolution.high)
 			{
-				segi.voxelResolution = SEGI.VoxelResolution.low;
+				segi.voxelResolution = SEGIRenderer.VoxelResolution.low;
 				voxelResolution.text = "Voxel Resolution: 128";
 			}
 			else
 			{
-				segi.voxelResolution = SEGI.VoxelResolution.high;
+				segi.voxelResolution = SEGIRenderer.VoxelResolution.high;
 				voxelResolution.text = "Voxel Resolution: 256";
 			}
 		}

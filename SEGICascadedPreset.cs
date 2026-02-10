@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SEGICascadedPreset : ScriptableObject
 {
-	public SEGICascaded.VoxelResolution voxelResolution = SEGICascaded.VoxelResolution.high;
+	public SEGICascadedRenderer.VoxelResolution voxelResolution = SEGICascadedRenderer.VoxelResolution.high;
 	public bool voxelAA = false;
 	[Range(0, 2)]
 	public int innerOcclusionLayers = 1;

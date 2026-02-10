@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 
-[CustomEditor(typeof(SEGI))]
-public class SEGIEditor : Editor
+[CustomEditor(typeof(SEGIRenderer))]
+public class SEGIRendererEditor : Editor
 {
 	SerializedObject serObj;
 
@@ -50,7 +50,7 @@ public class SEGIEditor : Editor
 	SerializedProperty sphericalSkylight;
 	SerializedProperty innerOcclusionLayers;
 
-	SEGI instance;
+    SEGIRenderer instance;
 
 	const string presetPath = "Assets/SEGI/Resources/Presets";
 
@@ -124,7 +124,7 @@ public class SEGIEditor : Editor
 		innerOcclusionLayers = serObj.FindProperty("innerOcclusionLayers");
 
 
-		instance = target as SEGI;
+		instance = target as SEGIRenderer;
 	}
 
 	public override void OnInspectorGUI()
