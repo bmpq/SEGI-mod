@@ -8,6 +8,8 @@ public class SEGIRendererEditor : Editor
 {
 	SerializedObject serObj;
 
+	SerializedProperty assetResources;
+
 	SerializedProperty voxelResolution;
 	SerializedProperty visualizeSunDepthTexture;
 	SerializedProperty visualizeGI;
@@ -93,7 +95,9 @@ public class SEGIRendererEditor : Editor
 	{
 		serObj = new SerializedObject(target);
 
-		voxelResolution = serObj.FindProperty("voxelResolution");
+        assetResources = serObj.FindProperty("assetResources");
+
+        voxelResolution = serObj.FindProperty("voxelResolution");
 		visualizeSunDepthTexture = serObj.FindProperty("visualizeSunDepthTexture");
 		visualizeGI = serObj.FindProperty("visualizeGI");
 		sun = serObj.FindProperty("sun");
@@ -186,8 +190,10 @@ public class SEGIRendererEditor : Editor
 		EditorGUILayout.Space();
 		EditorGUILayout.Space();
 
-		//Main Configuration
-		showMainConfig = EditorGUILayout.Foldout(showMainConfig, new GUIContent("Main Configuration"));
+        EditorGUILayout.PropertyField(assetResources, new GUIContent("Asset Resources", "Asset references."));
+
+        //Main Configuration
+        showMainConfig = EditorGUILayout.Foldout(showMainConfig, new GUIContent("Main Configuration"));
 		if (showMainConfig)
 		{
 			EditorGUI.indentLevel++;

@@ -8,7 +8,9 @@ public class SEGICascadedEditor : Editor
 {
 	SerializedObject serObj;
 
-	SerializedProperty voxelResolution;
+    SerializedProperty assetResources;
+
+    SerializedProperty voxelResolution;
 	SerializedProperty visualizeSunDepthTexture;
 	SerializedProperty visualizeGI;
 	SerializedProperty sun;
@@ -93,7 +95,9 @@ public class SEGICascadedEditor : Editor
 	{
 		serObj = new SerializedObject(target);
 
-		voxelResolution = serObj.FindProperty("voxelResolution");
+        assetResources = serObj.FindProperty("assetResources");
+
+        voxelResolution = serObj.FindProperty("voxelResolution");
 		visualizeSunDepthTexture = serObj.FindProperty("visualizeSunDepthTexture");
 		visualizeGI = serObj.FindProperty("visualizeGI");
 		sun = serObj.FindProperty("sun");
@@ -188,8 +192,10 @@ public class SEGICascadedEditor : Editor
 		EditorGUILayout.Space();
 		EditorGUILayout.Space();
 
-		//Main Configuration
-		showMainConfig = EditorGUILayout.Foldout(showMainConfig, new GUIContent("Main Configuration"));
+        EditorGUILayout.PropertyField(assetResources, new GUIContent("Asset Resources", "Asset references."));
+
+        //Main Configuration
+        showMainConfig = EditorGUILayout.Foldout(showMainConfig, new GUIContent("Main Configuration"));
 		if (showMainConfig)
 		{
 			EditorGUI.indentLevel++;
