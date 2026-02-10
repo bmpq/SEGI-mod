@@ -14,11 +14,11 @@ using System.Runtime.Serialization.Formatters.Binary;
 [AddComponentMenu("Image Effects/Sonic Ether/SEGI (Cascaded)")]
 public class SEGICascadedRenderer : MonoBehaviour
 {
+    public SEGIAssets assetResources;
 
 
-
-#region Parameters
-	[Serializable]
+    #region Parameters
+    [Serializable]
 	public enum VoxelResolution
 	{
 		low = 64,
@@ -563,18 +563,31 @@ public class SEGICascadedRenderer : MonoBehaviour
 
 	void Init()
 	{
-		//Setup shaders and materials
-		sunDepthShader = Shader.Find("Hidden/SEGIRenderSunDepth_C");
-		clearCompute = Resources.Load("SEGIClear_C") as ComputeShader;
-		transferIntsCompute = Resources.Load("SEGITransferInts_C") as ComputeShader;
-		mipFilterCompute = Resources.Load("SEGIMipFilter_C") as ComputeShader;
-		voxelizationShader = Shader.Find("Hidden/SEGIVoxelizeScene_C");
-		voxelTracingShader = Shader.Find("Hidden/SEGITraceScene_C");
+        if (assetResources == null)
+        {
+			assetResources = Resources.Load<SEGIAssets>("SEGIAssets_C");
+			if (assetResources == null)
+			{
+				Debug.LogError("SEGI: 'assetResources' is not assigned!");
+				enabled = false;
+				return;
+			}
+        }
 
-		if (!material) {
-			material = new Material(Shader.Find("Hidden/SEGI_C"));
-			material.hideFlags = HideFlags.HideAndDontSave;
-		}
+        //Setup shaders and materials
+        sunDepthShader = assetResources.sunDepthShader;
+        clearCompute = assetResources.clearCompute;
+        transferIntsCompute = assetResources.transferIntsCompute;
+        mipFilterCompute = assetResources.mipFilterCompute;
+
+        voxelizationShader = assetResources.voxelizationShader;
+        voxelTracingShader = assetResources.voxelTracingShader;
+
+        if (!material)
+        {
+            material = new Material(assetResources.mainSegiShader);
+            material.hideFlags = HideFlags.HideAndDontSave;
+        }
 
 		//Get the camera attached to this game object
 		attachedCamera = this.GetComponent<Camera>();
