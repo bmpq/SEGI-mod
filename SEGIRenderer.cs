@@ -511,13 +511,17 @@ public class SEGIRenderer : MonoBehaviour
 	}
 
 	void Init()
-	{
-		if (assetResources == null)
-		{
-			Debug.LogError("SEGI: 'assetResources' is not assigned!");
-			enabled = false;
-			return;
-		}
+    {
+        if (assetResources == null)
+        {
+            assetResources = Resources.Load<SEGIAssets>("SEGIAssets");
+            if (assetResources == null)
+            {
+                Debug.LogError("SEGI: 'assetResources' is not assigned!");
+                enabled = false;
+                return;
+            }
+        }
 
 		//Setup shaders and materials
 		sunDepthShader = assetResources.sunDepthShader;
