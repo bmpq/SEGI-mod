@@ -52,7 +52,19 @@ public class SEGIRendererEditor : Editor
 
     SEGIRenderer instance;
 
-	const string presetPath = "Assets/SEGI/Resources/Presets";
+	string PresetSavePath
+	{
+	    get
+	    {
+	        MonoScript script = MonoScript.FromMonoBehaviour(instance);
+	        string scriptPath = AssetDatabase.GetAssetPath(script);
+	        string scriptDirectory = System.IO.Path.GetDirectoryName(scriptPath);
+	        
+	        scriptDirectory = scriptDirectory.Replace("\\", "/");
+	
+	        return scriptDirectory + "/Resources/Presets";
+	    }
+	}
 
 	GUIStyle headerStyle;
 	GUIStyle vramLabelStyle
@@ -136,7 +148,7 @@ public class SEGIRendererEditor : Editor
 		if (showPresets)
 		{
 			EditorGUI.indentLevel++;
-			string[] presetGUIDs = AssetDatabase.FindAssets("t:SEGIPreset", new string[1] { presetPath });
+			string[] presetGUIDs = AssetDatabase.FindAssets("t:SEGIPreset");
 			string[] presetNames = new string[presetGUIDs.Length];
 			string[] presetPaths = new string[presetGUIDs.Length];
 
@@ -328,11 +340,21 @@ public class SEGIRendererEditor : Editor
 		preset.secondaryCones = instance.secondaryCones;
 		preset.secondaryOcclusionStrength = instance.secondaryOcclusionStrength;
 
-		string path = presetPath + "/";
+		string folderPath = PresetSavePath;
 
-		AssetDatabase.CreateAsset(preset, path + name + ".asset");
+		if (!System.IO.Directory.Exists(folderPath))
+		{
+			System.IO.Directory.CreateDirectory(folderPath);
+        	AssetDatabase.Refresh();
+		}
 
+		string fullPath = folderPath + "/" + name + ".asset";
+
+		fullPath = AssetDatabase.GenerateUniqueAssetPath(fullPath);
+
+		AssetDatabase.CreateAsset(preset, fullPath);
 		AssetDatabase.SaveAssets();
+		AssetDatabase.Refresh();
 	}
 
 	void LoadPreset()

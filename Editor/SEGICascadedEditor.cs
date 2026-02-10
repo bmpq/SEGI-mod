@@ -52,7 +52,19 @@ public class SEGICascadedEditor : Editor
 
     SEGICascadedRenderer instance;
 
-	const string presetPath = "Assets/SEGI/Resources/Cascaded Presets";
+	string PresetSavePath
+	{
+		get
+		{
+			MonoScript script = MonoScript.FromMonoBehaviour(instance);
+			string scriptPath = AssetDatabase.GetAssetPath(script);
+			string scriptDirectory = System.IO.Path.GetDirectoryName(scriptPath);
+        
+        	scriptDirectory = scriptDirectory.Replace("\\", "/");
+
+			return scriptDirectory + "/Resources/Cascaded Presets";
+		}
+	}
 
 	GUIStyle headerStyle;
 	GUIStyle vramLabelStyle
@@ -138,7 +150,7 @@ public class SEGICascadedEditor : Editor
 		if (showPresets)
 		{
 			EditorGUI.indentLevel++;
-			string[] presetGUIDs = AssetDatabase.FindAssets("t:SEGICascadedPreset", new string[1] { presetPath });
+			string[] presetGUIDs = AssetDatabase.FindAssets("t:SEGICascadedPreset");
 			string[] presetNames = new string[presetGUIDs.Length];
 			string[] presetPaths = new string[presetGUIDs.Length];
 
@@ -333,11 +345,20 @@ public class SEGICascadedEditor : Editor
 		preset.secondaryCones = instance.secondaryCones;
 		preset.secondaryOcclusionStrength = instance.secondaryOcclusionStrength;
 
-		string path = presetPath + "/";
+        string folderPath = PresetSavePath;
 
-		AssetDatabase.CreateAsset(preset, path + name + ".asset");
+        if (!System.IO.Directory.Exists(folderPath))
+        {
+            System.IO.Directory.CreateDirectory(folderPath);
+            AssetDatabase.Refresh();
+        }
 
-		AssetDatabase.SaveAssets();
+        string fullPath = folderPath + "/" + name + ".asset";
+        fullPath = AssetDatabase.GenerateUniqueAssetPath(fullPath);
+
+        AssetDatabase.CreateAsset(preset, fullPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
 	}
 
 	void LoadPreset()
