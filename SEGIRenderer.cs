@@ -17,97 +17,168 @@ public class SEGIRenderer : MonoBehaviour
 {
     public SEGIAssets assetResources;
 
-    #region Parameters
+    [Header("Main Configuration")]
+
+    [Tooltip("The resolution of the voxel texture used to calculate GI.")]
+    public VoxelResolution voxelResolution = VoxelResolution.high;
+
+    [Tooltip("Enables anti-aliasing during voxelization for higher precision voxels.")]
+    public bool voxelAA = false;
+
+    [Range(0, 2)]
+    [Tooltip("Enables the writing of additional black occlusion voxel layers on the back face of geometry. Can help with light leaking but may cause artifacts with small objects.")]
+    public int innerOcclusionLayers = 1;
+
+    [Tooltip("Enables gaussian filtering during mipmap generation. This can improve visual smoothness and consistency, particularly with large moving objects.")]
+    public bool gaussianMipFilter = false;
+
+    [Tooltip("The size of the voxel volume in world units. Everything inside the voxel volume will contribute to GI.")]
+    public float voxelSpaceSize = 25.0f;
+
+    [Tooltip("The size of the sun shadow texture used to inject sunlight with shadows into the voxels in world units. It is recommended to set this value similar to Voxel Space Size.")]
+    public float shadowSpaceSize = 50.0f;
+
+    [Tooltip("Which layers should be voxelized and contribute to GI.")]
+    public LayerMask giCullingMask = 2147483647;
+
+    [Tooltip("Whether voxelization and multi-bounce rendering should update every frame. When disabled, GI tracing will use cached data from the last time this was enabled.")]
+    public bool updateGI = true;
+
+    [Tooltip("Enables infinite bounces. This is expensive for complex scenes and is still experimental.")]
+    public bool infiniteBounces = false;
+
+    [Tooltip("If provided, the voxel volume will follow and be centered on this object instead of the camera. Useful for top-down scenes.")]
+    public Transform followTransform;
+
+    [Header("Environment Properties")]
+
+    [Tooltip("The main directional light that will cast indirect light into the scene (sunlight or moonlight).")]
+    public Light sun;
+
+    [Range(0.0f, 16.0f)]
+    [Tooltip("The amount of soft diffuse sunlight that will be added to the scene. Use this to simulate the effect of clouds/haze scattering soft sunlight onto the scene.")]
+    public float softSunlight = 0.0f;
+
+    [Tooltip("The color of the light scattered onto the scene coming from the sky.")]
+    public Color skyColor;
+
+    [Range(0.0f, 8.0f)]
+    [Tooltip("The brightness of the sky light.")]
+    public float skyIntensity = 1.0f;
+
+    [Tooltip("If enabled, light from the sky will come from all directions. If disabled, light from the sky will only come from the top hemisphere.")]
+    public bool sphericalSkylight = false;
+
+    [Header("Tracing Properties")]
+
+    [Range(0.01f, 1.0f)]
+    [Tooltip("The lower the value, the more previous frames will be blended with the current frame. Lower values result in smoother GI that updates less quickly.")]
+    public float temporalBlendWeight = 0.1f;
+
+    [Tooltip("Enables filtering of the GI result to reduce noise.")]
+    public bool useBilateralFiltering = false;
+
+    [Tooltip("If enabled, GI tracing will be done at half screen resolution. Improves speed of GI tracing.")]
+    public bool halfResolution = true;
+
+    [Tooltip("If enabled, uses random jitter to reduce banding and discontinuities during GI tracing.")]
+    public bool stochasticSampling = true;
+
+    [Range(1, 128)]
+    [Tooltip("The number of cones that will be traced in different directions for diffuse GI tracing. More cones result in a smoother result at the cost of performance.")]
+    public int cones = 6;
+
+    [Range(1, 32)]
+    [Tooltip("The number of tracing steps for each cone. Too few results in skipping thin features. Higher values result in more accuracy at the cost of performance.")]
+    public int coneTraceSteps = 14;
+
+    [Range(0.1f, 2.0f)]
+    [Tooltip("The length of the cones in world units.")]
+    public float coneLength = 1.0f;
+
+    [Range(0.5f, 6.0f)]
+    [Tooltip("The width of each cone. Wider cones cause a softer and smoother result but affect accuracy and incrase over-occlusion. Thinner cones result in more accurate tracing with less coherent (more noisy) results and a higher tracing cost.")]
+    public float coneWidth = 5.5f;
+
+    [Range(0.0f, 4.0f)]
+    [Tooltip("The amount of offset above a surface that cone tracing begins. Higher values reduce \"voxel acne\" (similar to \"shadow acne\"). Values that are too high result in light-leaking.")]
+    public float coneTraceBias = 1.0f;
+
+    [Range(0.0f, 4.0f)]
+    [Tooltip("The strength of shadowing solid objects will cause. Affects the strength of all indirect shadows.")]
+    public float occlusionStrength = 1.0f;
+
+    [Range(0.0f, 4.0f)]
+    [Tooltip("The strength of shadowing nearby solid objects will cause. Only affects the strength of very close blockers.")]
+    public float nearOcclusionStrength = 0.5f;
+
+    [Range(0.1f, 4.0f)]
+    [Tooltip("How much light far occluders block. This value gives additional light blocking proportional to the width of the cone at each trace step.")]
+    public float farOcclusionStrength = 1.0f;
+
+    [Range(0.1f, 4.0f)]
+    [Tooltip("How much light the farthest occluders block. This value gives additional light blocking proportional to (cone width)^2 at each trace step.")]
+    public float farthestOcclusionStrength = 1.0f;
+
+    [Range(0.001f, 4.0f)]
+    [Tooltip("The strength of shadowing far solid objects will cause. Only affects the strength of far blockers. Decrease this value if wide cones are causing over-occlusion.")]
+    public float occlusionPower = 1.5f;
+
+    [Range(0.0f, 4.0f)]
+    [Tooltip("Affects the attenuation of indirect light. Higher values allow for more close-proximity indirect light. Lower values reduce close-proximity indirect light, sometimes resulting in a cleaner result.")]
+    public float nearLightGain = 1.0f;
+
+    [Range(0.0f, 4.0f)]
+    [Tooltip("The overall brightness of indirect light. For Near Light Gain values around 1, a value of 1 for this property is recommended for a physically-accurate result.")]
+    public float giGain = 1.0f;
+
+    [Space]
+    [Range(0.0f, 4.0f)]
+    [Tooltip("Affects the strength of secondary/infinite bounces. Be careful, values above 1 can cause runaway light bouncing and flood areas with extremely bright light!")]
+    public float secondaryBounceGain = 1.0f;
+
+    [Range(3, 16)]
+    [Tooltip("The number of secondary cones that will be traced for calculating infinte bounces. Increasing this value improves the accuracy of secondary bounces at the cost of performance. Note: the performance cost of this scales with voxelized scene complexity.")]
+    public int secondaryCones = 6;
+
+    [Range(0.1f, 4.0f)]
+    [Tooltip("The strength of light blocking during secondary bounce tracing. Be careful, a value too low can cause runaway light bouncing and flood areas with extremely bright light!")]
+    public float secondaryOcclusionStrength = 1.0f;
+
+    [Header("Reflection Properties")]
+
+    [Tooltip("Enable this for cone-traced reflections.")]
+    public bool doReflections = true;
+
+    [Range(12, 128)]
+    [Tooltip("Number of reflection trace steps.")]
+    public int reflectionSteps = 64;
+
+    [Range(0.001f, 4.0f)]
+    [Tooltip("Strength of light blocking during reflection tracing.")]
+    public float reflectionOcclusionPower = 1.0f;
+
+    [Range(0.0f, 1.0f)]
+    [Tooltip("Intensity of sky reflections.")]
+    public float skyReflectionIntensity = 1.0f;
+
+    [Header("Debug Tools")]
+
+    [Tooltip("Visualize the depth texture used to render proper shadows while injecting sunlight into voxel data.")]
+    public bool visualizeSunDepthTexture = false;
+
+    [Tooltip("Visualize GI result only (no textures).")]
+    public bool visualizeGI = false;
+
+    [Tooltip("Directly view the voxels in the scene.")]
+    public bool visualizeVoxels = false;
+
     [Serializable]
     public enum VoxelResolution
     {
         low = 128,
         high = 256
     }
-
-    public bool updateGI = true;
-    public LayerMask giCullingMask = 2147483647;
-    public float shadowSpaceSize = 50.0f;
-    public Light sun;
-
-    public Color skyColor;
-
-    public float voxelSpaceSize = 25.0f;
-
-    public bool useBilateralFiltering = false;
-
-    [Range(0, 2)]
-    public int innerOcclusionLayers = 1;
-
-
-    [Range(0.01f, 1.0f)]
-    public float temporalBlendWeight = 0.1f;
-
-
-    public VoxelResolution voxelResolution = VoxelResolution.high;
-
-    public bool visualizeSunDepthTexture = false;
-    public bool visualizeGI = false;
-    public bool visualizeVoxels = false;
-
-    public bool halfResolution = true;
-    public bool stochasticSampling = true;
-    public bool infiniteBounces = false;
-    public Transform followTransform;
-    [Range(1, 128)]
-    public int cones = 6;
-    [Range(1, 32)]
-    public int coneTraceSteps = 14;
-    [Range(0.1f, 2.0f)]
-    public float coneLength = 1.0f;
-    [Range(0.5f, 6.0f)]
-    public float coneWidth = 5.5f;
-    [Range(0.0f, 4.0f)]
-    public float occlusionStrength = 1.0f;
-    [Range(0.0f, 4.0f)]
-    public float nearOcclusionStrength = 0.5f;
-    [Range(0.001f, 4.0f)]
-    public float occlusionPower = 1.5f;
-    [Range(0.0f, 4.0f)]
-    public float coneTraceBias = 1.0f;
-    [Range(0.0f, 4.0f)]
-    public float nearLightGain = 1.0f;
-    [Range(0.0f, 4.0f)]
-    public float giGain = 1.0f;
-    [Range(0.0f, 4.0f)]
-    public float secondaryBounceGain = 1.0f;
-    [Range(0.0f, 16.0f)]
-    public float softSunlight = 0.0f;
-
-    [Range(0.0f, 8.0f)]
-    public float skyIntensity = 1.0f;
-
-    public bool doReflections = true;
-    [Range(12, 128)]
-    public int reflectionSteps = 64;
-    [Range(0.001f, 4.0f)]
-    public float reflectionOcclusionPower = 1.0f;
-    [Range(0.0f, 1.0f)]
-    public float skyReflectionIntensity = 1.0f;
-
-    public bool voxelAA = false;
-
-    public bool gaussianMipFilter = false;
-
-
-    [Range(0.1f, 4.0f)]
-    public float farOcclusionStrength = 1.0f;
-    [Range(0.1f, 4.0f)]
-    public float farthestOcclusionStrength = 1.0f;
-
-    [Range(3, 16)]
-    public int secondaryCones = 6;
-    [Range(0.1f, 4.0f)]
-    public float secondaryOcclusionStrength = 1.0f;
-
-    public bool sphericalSkylight = false;
-
-    #endregion
 
 
 
