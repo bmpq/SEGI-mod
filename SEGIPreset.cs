@@ -55,4 +55,7 @@ public class SEGIPreset : ScriptableObject
     public int secondaryCones = 6;
     [Range(0.1f, 4.0f)]
     public float secondaryOcclusionStrength = 1.0f;
+
+    [Range(0.0f, 8.0f)]
+    public float emissionContribution = 1.0f;
 }

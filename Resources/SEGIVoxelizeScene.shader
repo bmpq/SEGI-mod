@@ -38,7 +38,8 @@
 				half4 _EmissionColor;
 
 				float SEGISecondaryBounceGain;
-				
+				float SEGIEmissionContribution;
+
 				float _BlockerValue;
 				
 				
@@ -312,8 +313,8 @@
 						color.rgb = float3(1, 1, 1);
 					}
 
-					
-					float3 col = sunVisibility.xxx * sunNdotL * color.rgb * tex.rgb * GISunColor.rgb * GISunColor.a + _EmissionColor.rgb * 0.9 * emissionTex.rgb;
+
+				float3 col = sunVisibility.xxx * sunNdotL * color.rgb * tex.rgb * GISunColor.rgb * GISunColor.a + _EmissionColor.rgb * 0.9 * emissionTex.rgb * SEGIEmissionContribution;
 
 					float4 prevBounce = tex3D(SEGIVolumeTexture1, fcoord + SEGIVoxelSpaceOriginDelta.xyz);
 					col.rgb += prevBounce.rgb * 1.6 * SEGISecondaryBounceGain * tex.rgb * color.rgb;

@@ -59,6 +59,10 @@ public class SEGIRenderer : MonoBehaviour
     [Tooltip("The amount of soft diffuse sunlight that will be added to the scene. Use this to simulate the effect of clouds/haze scattering soft sunlight onto the scene.")]
     public float softSunlight = 0.0f;
 
+    [Range(0.0f, 8.0f)]
+    [Tooltip("Controls the intensity of emissive materials' contribution to global illumination.")]
+    public float emissionContribution = 1.0f;
+
     [Tooltip("The color of the light scattered onto the scene coming from the sky.")]
     public Color skyColor;
 
@@ -432,6 +436,7 @@ public class SEGIRenderer : MonoBehaviour
         farthestOcclusionStrength = preset.farthestOcclusionStrength;
         secondaryCones = preset.secondaryCones;
         secondaryOcclusionStrength = preset.secondaryOcclusionStrength;
+        emissionContribution = preset.emissionContribution;
     }
 
     void Start()
@@ -1027,6 +1032,7 @@ public class SEGIRenderer : MonoBehaviour
             Shader.SetGlobalFloat("SEGISoftSunlight", softSunlight);
             Shader.SetGlobalInt("SEGISphericalSkylight", sphericalSkylight ? 1 : 0);
             Shader.SetGlobalInt("SEGIInnerOcclusionLayers", innerOcclusionLayers);
+            Shader.SetGlobalFloat("SEGIEmissionContribution", emissionContribution);
 
 
             //Render the depth texture from the sun's perspective in order to inject sunlight with shadows during voxelization
