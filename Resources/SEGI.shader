@@ -366,6 +366,8 @@ SubShader
 			
 			int FrameSwitch;
 
+			half4 SEGIReflectionSkyColor;
+
 			
 			float4 frag(v2f input) : SV_Target
 			{
@@ -406,8 +408,8 @@ SubShader
 				
 				voxelOrigin += worldNormal.xyz * 0.002 * 1.25 / SEGIVoxelScaleFactor;
 				reflection = SpecularConeTrace(voxelOrigin.xyz, reflectionKernel.xyz, worldNormal.xyz, smoothness, coord, dither.x);
-
-				float3 skyReflection = (reflection.a * 1.0 * SEGISkyColor);
+				
+				float3 skyReflection = (reflection.a * 1.0 * SEGIReflectionSkyColor.rgb);
 				
 				reflection.rgb = reflection.rgb * 0.7 + skyReflection.rgb * 2.4015 * SkyReflectionIntensity;
 				

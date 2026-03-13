@@ -162,6 +162,9 @@ public class SEGIRenderer : MonoBehaviour
     [Tooltip("Strength of light blocking during reflection tracing.")]
     public float reflectionOcclusionPower = 1.0f;
 
+    [Tooltip("The color of the sky mapped to reflections.")]
+    public Color reflectionSkyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+
     [Range(0.0f, 1.0f)]
     [Tooltip("Intensity of sky reflections.")]
     public float skyReflectionIntensity = 1.0f;
@@ -1027,6 +1030,7 @@ public class SEGIRenderer : MonoBehaviour
             //Set paramteters
             Shader.SetGlobalColor("GISunColor", sun == null ? Color.black : new Color(Mathf.Pow(sun.color.r, 2.2f), Mathf.Pow(sun.color.g, 2.2f), Mathf.Pow(sun.color.b, 2.2f), Mathf.Pow(sun.intensity, 2.2f)));
             Shader.SetGlobalColor("SEGISkyColor", new Color(Mathf.Pow(skyColor.r * skyIntensity * 0.5f, 2.2f), Mathf.Pow(skyColor.g * skyIntensity * 0.5f, 2.2f), Mathf.Pow(skyColor.b * skyIntensity * 0.5f, 2.2f), Mathf.Pow(skyColor.a, 2.2f)));
+            Shader.SetGlobalColor("SEGIReflectionSkyColor", new Color(Mathf.Pow(reflectionSkyColor.r, 2.2f), Mathf.Pow(reflectionSkyColor.g, 2.2f), Mathf.Pow(reflectionSkyColor.b, 2.2f), Mathf.Pow(reflectionSkyColor.a, 2.2f)));
             Shader.SetGlobalFloat("GIGain", giGain);
             Shader.SetGlobalFloat("SEGISecondaryBounceGain", infiniteBounces ? secondaryBounceGain : 0.0f);
             Shader.SetGlobalFloat("SEGISoftSunlight", softSunlight);
