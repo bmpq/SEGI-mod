@@ -1028,8 +1028,8 @@ public class SEGIRenderer : MonoBehaviour
             Shader.SetGlobalVector("SEGISunlightVector", sun ? Vector3.Normalize(sun.transform.forward) : Vector3.up);
 
             //Set paramteters
-            Shader.SetGlobalColor("GISunColor", sun == null ? Color.black : new Color(Mathf.Pow(sun.color.r, 2.2f), Mathf.Pow(sun.color.g, 2.2f), Mathf.Pow(sun.color.b, 2.2f), Mathf.Pow(sun.intensity, 2.2f)));
-            Shader.SetGlobalColor("SEGISkyColor", new Color(Mathf.Pow(skyColor.r * skyIntensity * 0.5f, 2.2f), Mathf.Pow(skyColor.g * skyIntensity * 0.5f, 2.2f), Mathf.Pow(skyColor.b * skyIntensity * 0.5f, 2.2f), Mathf.Pow(skyColor.a, 2.2f)));
+            Shader.SetGlobalColor("GISunColor", sun == null ? Color.black : new Color(sun.color.r, sun.color.g, sun.color.b, sun.intensity).linear);
+            Shader.SetGlobalColor("SEGISkyColor", new Color(skyColor.r * skyIntensity, skyColor.g * skyIntensity, skyColor.b * skyIntensity, skyColor.a).linear);
             Shader.SetGlobalColor("SEGIReflectionSkyColor", new Color(Mathf.Pow(reflectionSkyColor.r, 2.2f), Mathf.Pow(reflectionSkyColor.g, 2.2f), Mathf.Pow(reflectionSkyColor.b, 2.2f), Mathf.Pow(reflectionSkyColor.a, 2.2f)));
             Shader.SetGlobalFloat("GIGain", giGain);
             Shader.SetGlobalFloat("SEGISecondaryBounceGain", infiniteBounces ? secondaryBounceGain : 0.0f);
